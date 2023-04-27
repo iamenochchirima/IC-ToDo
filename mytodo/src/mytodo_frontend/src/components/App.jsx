@@ -15,7 +15,6 @@ const App = () => {
   }
 
   useEffect(() => {
-    console.log("Fetching totos")
     fetchData();
   }, []);
 
@@ -48,8 +47,6 @@ const App = () => {
       });
     });
   }
-
-  console.log(todos)
 
   return (
     <div>

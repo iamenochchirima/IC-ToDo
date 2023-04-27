@@ -6,7 +6,7 @@ actor BlockTodo {
     content : Text;
   };
 
-  var todos : List.List<Todo> = List.nil<Todo>();
+  stable var todos : List.List<Todo> = List.nil<Todo>();
 
   public func createTodo(contentText : Text) {
 
@@ -15,7 +15,7 @@ actor BlockTodo {
     };
 
     todos := List.push(newTodo, todos);
-    Debug.print(debug_show (todos));
+    // Debug.print(debug_show (todos));
   };
 
   public query func readTodos() : async [Todo] {
@@ -37,7 +37,7 @@ actor BlockTodo {
   let listFront = List.take(todos, id);
   let listBack = List.drop(todos, id + 1);
   todos := List.append(listFront, List.push(updatedTodo, listBack));
-  Debug.print(debug_show(todos));
+  // Debug.print(debug_show(todos));
 };
 
 };
