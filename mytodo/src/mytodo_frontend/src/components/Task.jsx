@@ -30,39 +30,44 @@ const Task = ({ id, content, onDelete, onUpdate }) => {
   return (
     <div className="taskcontainer">
       <div className="task-card">
-      {!isEditing ? (
-        <>
-          <div className="task-content">{content}</div>
-          <div className="task-buttons">
-            <button className="task-edit" onClick={handleEdit}>
-              <FaEdit className="task-icon" />
-            </button>
-            <button className="task-delete" onClick={handleDelete}>
-              <FaTrash className="task-icon" />
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          <textarea
-            className="task-edit-input"
-            value={updatedContent}
-            onChange={handleInputChange}
-          />
-          <div className="task-buttons">
-            <button className="task-save" onClick={handleSave}>
-              Save
-            </button>
-            <button className="task-cancel" onClick={handleCancel}>
-              Cancel
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+        {!isEditing ? (
+          <>
+            <div className="task-content">{content}</div>
+            <div className="task-buttons">
+              <button
+                className="bg-white border-none rounded mr-5 py-1 px-2"
+                onClick={handleEdit}
+              >
+                <FaEdit size={18} className="text-gray-900" />
+              </button>
+              <button
+                className="bg-white border-none rounded mr-5 py-1 px-2"
+                onClick={handleDelete}
+              >
+                <FaTrash size={18} className="text-gray-900" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <textarea
+              className="border-black rounded mt-2 p-1 w-full text-black"
+              value={updatedContent}
+              onChange={handleInputChange}
+            />
+            <div className="task-buttons">
+              <button className="task-save" onClick={handleSave}>
+                Save
+              </button>
+              <button className="task-cancel" onClick={handleCancel}>
+                Cancel
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
 export default Task;
-

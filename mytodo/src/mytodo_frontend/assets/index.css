@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   padding: 0;
   margin: 0;
@@ -13,14 +17,6 @@ body {
   color: #e3eaec;
 }
 
-.header {
-  background: #161b24;
-  height: 100px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-left: 20px;
-}
 
 .create-container {
   display: flex;

@@ -35,7 +35,7 @@ const CreateTask = (props) => {
         onChange={handleInputChange}
         placeholder="Enter a new task..."
         rows={4}
-        className="createtask-textarea"
+        className="border-black rounded p-2 mb-4 text-lg text-black"
       />
       <button type="submit" className="createtask-button">
         Save
