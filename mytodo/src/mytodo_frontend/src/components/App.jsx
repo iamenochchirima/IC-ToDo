@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home";
-import Newpage from "./Newpage";
+import Gallary from "../pages/Gallary";
 
 <BrowserRouter></BrowserRouter>;
 
@@ -10,7 +10,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="/test" element={<Newpage />} />
+        <Route path="/gallary" element={<Gallary />} />
       </Routes>
     </BrowserRouter>
   );

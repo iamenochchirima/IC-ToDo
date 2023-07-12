@@ -1,4 +1,10 @@
 {
+  "file_storage": {
+    "ic": "kyzel-7yaaa-aaaal-qb73a-cai"
+  },
+  "file_scaling_manager": {
+    "ic": "yg4ya-nyaaa-aaaal-qb3eq-cai"
+  },
   "mytodo_backend": {
     "ic": "jz3aw-xqaaa-aaaal-qbyna-cai"
   },
