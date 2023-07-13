@@ -11,9 +11,9 @@ import {
 } from "../config/functions";
 
 import { useLocation } from "react-router-dom";
-import { canisterId } from "../../../declarations/mytodo_backend/index";
+import { canisterId, mytodo_backend } from "../../../declarations/mytodo_backend/index";
 
-const Gallary = () => {
+const Items = () => {
   const [showForm, setShowForm] = useState(false);
   const [initiated, setInit] = useState(false);
   const location = useLocation();
@@ -21,17 +21,9 @@ const Gallary = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUpLoading] = useState(false);
 
-  // const [name, setName] = useState("");
-  // const [description, setDescription] = useState("");
-  // const [image1, setImage1] = useState(null);
-  // const [image2, setImage2] = useState(null);
-  // const [image3, setImage3] = useState(null);
-  // const [image1Link, setImage1Link] = useState("");
-  // const [image2Link, setImage2Link] = useState("");
-  // const [image3Link, setImage3Link] = useState("");
-
-  const [mediaFiles, setMediaFiles] = useState([]);
-  const [images, setImages] = useState([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [facts, setFacts] = useState([]);
   const [uploads, setUploads] = useState([]);
 
   const handleImageChange = (e) => {
@@ -40,31 +32,39 @@ const Gallary = () => {
     setUploads(selected);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const input = {
-  //     id: uuidv4(),
-  //     name: name,
-  //     description: description,
-  //     images: {
-  //       image1: image1Link,
-  //       image2: image2Link,
-  //       image3: image3Link,
-  //     },
-  //   };
-  //   console.log(input);
-  // };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const urls = await uploadAssets();
+      if (urls) {
+        setLoading(true)
+        const input = {
+          id: uuidv4(),
+          name: name,
+          description: description,
+          facts: urls,
+        };
+        const res = await mytodo_backend.saveFact(input)
+        if (res) {
+            console.log(res)
+            setLoading(false)
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const getImages = async () => {
-    const res = await getAllAssets();
+  const getFacts = async () => {
+    const res = await mytodo_backend.getFacts();
     if (res.ok) {
-      setImages(res.ok);
+      setFacts(res.ok);
     }
   };
 
   useEffect(() => {
     if (initiated) {
-      getImages();
+      getFacts();
       setLoading(false);
     }
   }, [initiated]);
@@ -80,11 +80,9 @@ const Gallary = () => {
     init();
   }, []);
 
-  const uploadAssets = async (e) => {
-    e.preventDefault();
+  const uploadAssets = async () => {
     if (initiated && uploads) {
       setUpLoading(true);
-      setLoading(true);
       const file_path = location.pathname;
       const assetsUrls = [];
 
@@ -93,37 +91,37 @@ const Gallary = () => {
           const assetUrl = await uploadFile(image, file_path);
           assetsUrls.push(assetUrl);
           console.log("This file was successfully uploaded:", image.name);
-          getImages();
+          getFacts();
           setUpLoading(false);
         } catch (error) {
           console.error("Error uploading file:", image.name, error);
         }
       }
       setUrls(assetsUrls);
-      setLoading(false);
       console.log("Assets urls here", assetsUrls);
+      return assetsUrls;
     }
   };
 
   const handleDelete = async (url) => {
     deleteAsset(url);
-    getImages();
+    getFacts();
   };
 
-  console.log(images, "images here");
+  console.log(facts, "facts here");
 
   return (
     <div className="min-h-screen text-gray-800">
       <div className="flex flex-col items-center justify-center mt-5">
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-500 p-2  rounded-lg"
+          className="bg-blue-500 text-white p-2  rounded-lg"
         >
-          Upload images
+          Upload facts
         </button>
         {showForm && (
-          <form onSubmit={uploadAssets} className="mt-5">
-            {/* <div className="mb-4">
+          <form onSubmit={handleSubmit} className="mt-5">
+            <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">Name</label>
               <input
                 type="text"
@@ -141,7 +139,7 @@ const Gallary = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 className="border border-gray-400 rounded w-full py-2 px-3"
               ></textarea>
-            </div> */}
+            </div>
             <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">
                 Images
@@ -159,34 +157,33 @@ const Gallary = () => {
                 loading ? `bg-green-600` : `bg-blue-500`
               }   py-2 px-4 rounded-lg text-white`}
             >
-              {loading ? "Uploading..." : "Upload"}
+              {uploading && "Uploading..."}
+              {loading && "Saving..."}
             </button>
           </form>
         )}
       </div>
-      <div>
-        {images.length == 0 && (
+      <div className="flex">
+        {facts.length == 0 && (
           <h3 className="text-center">
-            {loading ? "Loading ..." : "No images uploaded yet"}
+            {loading ? "Loading ..." : "No facts uploaded yet"}
           </h3>
         )}
-        <div className="grid grid-cols-3 gap-3">
-          {images?.map((image) => (
-            <div key={image.id} className="col-span-1">
-              <img
-                src={image.url}
-                className=""
-                alt="Image"
-              />
-              <button className="my-4" onClick={() => handleDelete(image.url)}>
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
+        {facts?.map((fact) => (
+          <div key={fact.id} className="">
+            <h3>{fact.name}</h3>
+            <h3>{fact.description}</h3>
+            {fact.images.map((image, index) => (
+                <img key={index} src={image} className="h-[200px] w-[200px]" alt="Image" />
+            ))}
+            <button className="my-4" onClick={() => handleDelete(image.url)}>
+              Delete
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default Gallary;
+export default Items;

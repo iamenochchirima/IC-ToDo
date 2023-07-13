@@ -102,7 +102,7 @@ actor class FileStorage(is_prod : Bool) = this {
 		return chunk_id_count;
 	};
 
-	public shared ({ caller }) func commit_batch(batch_id : Text, chunk_ids : [Chunk_ID], asset_properties : AssetProperties, path : Text,) : async Result.Result<Asset_ID, Text> {
+	public shared ({ caller }) func commit_batch(batch_id : Text, chunk_ids : [Chunk_ID], asset_properties : AssetProperties, path : Text) : async Result.Result<Asset_ID, Text> {
 		let ASSET_ID = Utils.generate_uuid();
 		let CANISTER_ID = Principal.toText(Principal.fromActor(this));
 
@@ -167,13 +167,8 @@ actor class FileStorage(is_prod : Bool) = this {
 	public shared ({ caller }) func delete_asset(id : Asset_ID) : async Result.Result<Text, ErrDeleteAsset> {
 		switch (Map.get(assets, thash, id)) {
 			case (?asset) {
-				if (asset.owner == Principal.toText(caller)) {
-					Map.delete(assets, thash, id);
-
-					return #ok("Deleted Asset");
-				} else {
-					return #err(#NotAuthorized(true));
-				};
+				Map.delete(assets, thash, id);
+				return #ok("Deleted Asset");
 			};
 			case (_) {
 				return #err(#AssetNotFound(true));

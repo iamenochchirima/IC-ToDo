@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Header from "./Header";
-import Task from "./Task";
-import CreateTask from "./CreateTask";
+import Header from "../components/Header";
+import Task from "../components/Task";
+import CreateTask from "../components/CreateTask";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../../../declarations/mytodo_backend/index";
 import { mytodo_backend } from "../../../declarations/mytodo_backend/index";
 
-const Home = () => {
+const Todo = () => {
   const [todos, setTodos] = useState([]);
   const localHost = "http://127.0.0.1:8080/";
   const canister_id = "jz3aw-xqaaa-aaaal-qbyna-cai";
@@ -71,7 +71,6 @@ const Home = () => {
   }
   return (
     <div>
-      <Header />
       <CreateTask onAdd={addTodo} />
       {todos.map((todoItem, index) => {
         return (
@@ -88,4 +87,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Todo;

@@ -28,12 +28,12 @@ const getActor = async (canisterId, idlFactory, identity) => {
     identity: identity,
   });
 
-  agent.fetchRootKey().catch((err) => {
-    console.warn(
-      "Unable to fetch root key. Check to ensure that your local replica is running"
-    );
-    console.error(err);
-  });
+  // agent.fetchRootKey().catch((err) => {
+  //   console.warn(
+  //     "Unable to fetch root key. Check to ensure that your local replica is running"
+  //   );
+  //   console.error(err);
+  // });
 
   const actor = Actor.createActor(idlFactory, {
     agent: agent,

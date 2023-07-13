@@ -3,11 +3,44 @@ import Debug "mo:base/Debug";
 import Nat8 "mo:base/Nat8";
 import Int32 "mo:base/Int32";
 import Text "mo:base/Text";
+import Map "mo:hashmap/Map";
+import TrieMap "mo:base/TrieMap";
+import Iter "mo:base/Iter";
 
 actor BlockTodo {
   public type Todo = {
     content : Text;
   };
+
+  public type Fact = {
+    id : Text;
+    name : Text;
+    description : Text;
+    images : [Text]
+  };
+
+  var mapOfFacts = TrieMap.TrieMap<Text, Fact>(Text.equal, Text.hash);
+
+  // ------------------------------------SPACE------------------------------------------------------
+
+  public shared func saveFact(fact : Fact) : async Bool {
+    let id = fact.id;
+    mapOfFacts.put(id, fact);
+    return true;
+  };
+
+  public shared query func getFacts() : async [Fact] {
+    let facts = Iter.toArray(mapOfFacts.vals());
+    return facts;
+  };
+
+
+  public shared func deleteFact(id: Text) : async Bool {
+    mapOfFacts.delete(id);
+    return true;
+  };
+
+  // ----------------------------------------------TODO----------------------------------------------
 
   stable var todos : List.List<Todo> = List.nil<Todo>();
 
