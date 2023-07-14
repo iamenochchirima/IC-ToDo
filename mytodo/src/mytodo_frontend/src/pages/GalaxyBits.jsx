@@ -11,15 +11,21 @@ import {
 } from "../config/functions";
 
 import { useLocation } from "react-router-dom";
-import { canisterId, mytodo_backend } from "../../../declarations/mytodo_backend/index";
+import {
+  canisterId,
+  mytodo_backend,
+} from "../../../declarations/mytodo_backend/index";
+import FactCard from "../components/FactCard";
 
-const Items = () => {
+const GalaxyBits = () => {
   const [showForm, setShowForm] = useState(false);
   const [initiated, setInit] = useState(false);
   const location = useLocation();
   const [urls, setUrls] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUpLoading] = useState(false);
+
+  const [factId, setFactId] = useState("");
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -37,17 +43,17 @@ const Items = () => {
     try {
       const urls = await uploadAssets();
       if (urls) {
-        setLoading(true)
+        setLoading(true);
         const input = {
           id: uuidv4(),
           name: name,
           description: description,
-          facts: urls,
+          images: urls,
         };
-        const res = await mytodo_backend.saveFact(input)
+        const res = await mytodo_backend.saveFact(input);
         if (res) {
-            console.log(res)
-            setLoading(false)
+          console.log(res);
+          setLoading(false);
         }
       }
     } catch (error) {
@@ -56,9 +62,11 @@ const Items = () => {
   };
 
   const getFacts = async () => {
-    const res = await mytodo_backend.getFacts();
-    if (res.ok) {
-      setFacts(res.ok);
+    try {
+      const res = await mytodo_backend.getFacts();
+      setFacts(res);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -108,10 +116,26 @@ const Items = () => {
     getFacts();
   };
 
-  console.log(facts, "facts here");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handlePrevImage = (factImages, id) => {
+    setFactId(id)
+    const isFirstImage = currentImageIndex === 0;
+    const newIndex = isFirstImage
+      ? factImages.length - 1
+      : currentImageIndex - 1;
+    setCurrentImageIndex(newIndex);
+  };
+
+  const handleNextImage = (factImages, id) => {
+    setFactId(id)
+    const isLastImage = currentImageIndex === factImages.length - 1;
+    const newIndex = isLastImage ? 0 : currentImageIndex + 1;
+    setCurrentImageIndex(newIndex);
+  };
 
   return (
-    <div className="min-h-screen text-gray-800">
+    <div className="min-h-screen text-gray-300">
       <div className="flex flex-col items-center justify-center mt-5">
         <button
           onClick={() => setShowForm(true)}
@@ -157,33 +181,34 @@ const Items = () => {
                 loading ? `bg-green-600` : `bg-blue-500`
               }   py-2 px-4 rounded-lg text-white`}
             >
-              {uploading && "Uploading..."}
-              {loading && "Saving..."}
+              {uploading && "Uploading images..."}
+              {loading ? "Saving..." : "Save"}
             </button>
           </form>
         )}
       </div>
-      <div className="flex">
+      <div className="flex gap-4">
         {facts.length == 0 && (
           <h3 className="text-center">
             {loading ? "Loading ..." : "No facts uploaded yet"}
           </h3>
         )}
+        <div className="grid grid-cols-3 gap-3">
         {facts?.map((fact) => (
-          <div key={fact.id} className="">
-            <h3>{fact.name}</h3>
-            <h3>{fact.description}</h3>
-            {fact.images.map((image, index) => (
-                <img key={index} src={image} className="h-[200px] w-[200px]" alt="Image" />
-            ))}
-            <button className="my-4" onClick={() => handleDelete(image.url)}>
-              Delete
-            </button>
+          <div key={fact.id} className="col-span-1 ">
+            <FactCard
+              fact={fact}
+              id={factId}
+              currentImageIndex={currentImageIndex}
+              handlePrevImage={handlePrevImage}
+              handleNextImage={handleNextImage}
+            />
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Items;
+export default GalaxyBits;

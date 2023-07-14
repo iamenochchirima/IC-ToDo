@@ -25,26 +25,19 @@ const Header = () => {
   // }, []);
 
   return (
-    <div className="bg-gray-900 h-[100px] flex items-center gap-5 pl-5">
+    <div className="bg-gray-950 text-gray-300 h-[100px] flex justify-between items-center gap-5 pl-5">
       <h1 className="text-2xl font-extrabold">BLOCK-FILES</h1>
-      <Link
-        to="/"
-        className="px-2 py-1.5"
-      >
-        Gallary
-      </Link>
-      <Link
-        to="items"
-        className="px-2 py-1.5"
-      >
-        GalaxyBits
-      </Link>
-      <Link
-        to="todo"
-        className="px-2 py-1.5"
-      >
-        Todo
-      </Link>
+      <div className="mr-20 text-xl">
+        <Link to="/" className="px-2 py-1.5">
+          Gallary
+        </Link>
+        <Link to="galaxybits" className="px-2 py-1.5">
+          GalaxyBits
+        </Link>
+        <Link to="todo" className="px-2 py-1.5">
+          Todo
+        </Link>
+      </div>
     </div>
   );
 };

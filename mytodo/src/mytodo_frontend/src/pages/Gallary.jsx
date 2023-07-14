@@ -113,7 +113,7 @@ const Gallary = () => {
   console.log(images, "images here");
 
   return (
-    <div className="min-h-screen text-gray-800">
+    <div className="min-h-screen text-gray-800 px-5">
       <div className="flex flex-col items-center justify-center mt-5">
         <button
           onClick={() => setShowForm(true)}
@@ -123,25 +123,6 @@ const Gallary = () => {
         </button>
         {showForm && (
           <form onSubmit={uploadAssets} className="mt-5">
-            {/* <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border border-gray-400 rounded w-full py-2 px-3"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="border border-gray-400 rounded w-full py-2 px-3"
-              ></textarea>
-            </div> */}
             <div className="mb-4">
               <label className="block text-gray-700 font-bold mb-2">
                 Images

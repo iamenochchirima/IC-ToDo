@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Todo from "../pages/Todo";
 import Gallary from "../pages/Gallary";
 import Layout from "./Layout";
-import Items from "../pages/Items";
+import GalaxyBits from "../pages/GalaxyBits";
 
 const App = () => {
   return (
@@ -11,7 +11,7 @@ const App = () => {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Gallary />} />
-          <Route path="/items" element={<Items />} />
+          <Route path="/galaxybits" element={<GalaxyBits />} />
           <Route path="/todo" element={<Todo />} />
         </Route>
       </Routes>
