@@ -10,8 +10,7 @@ import { idlFactory as fileScalingManagerIdlFactory } from "../../../declaration
 // import { canisterId as scalingCanId } from "../../../declarations/file_scaling_manager/index";
 // import { canisterId } from "../../../declarations/file_storage/index";
 
-const scalingCanId = "yg4ya-nyaaa-aaaal-qb3eq-cai"
-const canisterId = "kyzel-7yaaa-aaaal-qb73a-cai"
+
 
 let motoko_identity = Ed25519KeyIdentity.generate();
 let fileScalingManagerActor;

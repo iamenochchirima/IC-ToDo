@@ -21,7 +21,7 @@ const GalaxyBits = () => {
   const [showForm, setShowForm] = useState(false);
   const [initiated, setInit] = useState(false);
   const location = useLocation();
-  const [urls, setUrls] = useState(null);
+  // const [urls, setUrls] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUpLoading] = useState(false);
 
@@ -31,19 +31,23 @@ const GalaxyBits = () => {
   const [description, setDescription] = useState("");
   const [facts, setFacts] = useState([]);
   const [uploads, setUploads] = useState([]);
+  const [imgCount, setImgCount] = useState(null)
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const selected = files.slice(0, 4);
+    setImgCount(selected.length)
     setUploads(selected);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Runing the submit function");
     try {
       const urls = await uploadAssets();
+      console.log("Images saved, urls here", urls);
+      setLoading(true);
       if (urls) {
-        setLoading(true);
         const input = {
           id: uuidv4(),
           name: name,
@@ -100,16 +104,19 @@ const GalaxyBits = () => {
           assetsUrls.push(assetUrl);
           console.log("This file was successfully uploaded:", image.name);
           getFacts();
-          setUpLoading(false);
+          setImgCount(prevCount => prevCount - 1); 
         } catch (error) {
           console.error("Error uploading file:", image.name, error);
         }
       }
-      setUrls(assetsUrls);
+      setUpLoading(false);
       console.log("Assets urls here", assetsUrls);
       return assetsUrls;
     }
   };
+
+  console.log(imgCount)
+  
 
   const handleDelete = async (url) => {
     deleteAsset(url);
@@ -119,7 +126,7 @@ const GalaxyBits = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handlePrevImage = (factImages, id) => {
-    setFactId(id)
+    setFactId(id);
     const isFirstImage = currentImageIndex === 0;
     const newIndex = isFirstImage
       ? factImages.length - 1
@@ -128,11 +135,12 @@ const GalaxyBits = () => {
   };
 
   const handleNextImage = (factImages, id) => {
-    setFactId(id)
+    setFactId(id);
     const isLastImage = currentImageIndex === factImages.length - 1;
     const newIndex = isLastImage ? 0 : currentImageIndex + 1;
     setCurrentImageIndex(newIndex);
   };
+
 
   return (
     <div className="min-h-screen text-gray-300">
@@ -151,7 +159,7 @@ const GalaxyBits = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="border border-gray-400 rounded w-full py-2 px-3"
+                className="border border-gray-400 text-gray-800 rounded w-full py-2 px-3"
               />
             </div>
             <div className="mb-4">
@@ -161,7 +169,7 @@ const GalaxyBits = () => {
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="border border-gray-400 rounded w-full py-2 px-3"
+                className="border border-gray-400 text-gray-800 rounded w-full py-2 px-3"
               ></textarea>
             </div>
             <div className="mb-4">
@@ -178,11 +186,12 @@ const GalaxyBits = () => {
             <button
               type="submit"
               className={`${
-                loading ? `bg-green-600` : `bg-blue-500`
+                loading || uploading ? `bg-green-600` : `bg-blue-500`
               }   py-2 px-4 rounded-lg text-white`}
             >
-              {uploading && "Uploading images..."}
-              {loading ? "Saving..." : "Save"}
+              {uploading && `Uploading images... ${imgCount}`}
+              {loading && "Saving..."}
+              {!uploading && !loading && "Save"}
             </button>
           </form>
         )}
@@ -194,17 +203,17 @@ const GalaxyBits = () => {
           </h3>
         )}
         <div className="grid grid-cols-3 gap-3">
-        {facts?.map((fact) => (
-          <div key={fact.id} className="col-span-1 ">
-            <FactCard
-              fact={fact}
-              id={factId}
-              currentImageIndex={currentImageIndex}
-              handlePrevImage={handlePrevImage}
-              handleNextImage={handleNextImage}
-            />
-          </div>
-        ))}
+          {facts?.map((fact) => (
+            <div key={fact.id} className="col-span-1 ">
+              <FactCard
+                fact={fact}
+                id={factId}
+                currentImageIndex={currentImageIndex}
+                handlePrevImage={handlePrevImage}
+                handleNextImage={handleNextImage}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>
