@@ -7,10 +7,11 @@ import imagesLoaded from "imagesloaded";
 import { idlFactory as fileStorageIdlFactory } from "../../../declarations/file_storage/file_storage.did.js";
 import { idlFactory as fileScalingManagerIdlFactory } from "../../../declarations/file_scaling_manager/file_scaling_manager.did.js";
 
-// import { canisterId as scalingCanId } from "../../../declarations/file_scaling_manager/index";
-// import { canisterId } from "../../../declarations/file_storage/index";
+import { canisterId as scalingCanId } from "../../../declarations/file_scaling_manager/index";
+import { canisterId } from "../../../declarations/file_storage/index";
 
-
+// const scalingCanId = "yg4ya-nyaaa-aaaal-qb3eq-cai"
+// const canisterId = "kyzel-7yaaa-aaaal-qb73a-cai"
 
 let motoko_identity = Ed25519KeyIdentity.generate();
 let fileScalingManagerActor;

@@ -1,28 +1,49 @@
-import React, { useEffect } from "react";
-import { Actor, HttpAgent } from "@dfinity/agent";
+import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import { AuthClient } from "@dfinity/auth-client";
 
 const Header = () => {
-  // const agent = new HttpAgent({
-  //   host: "http://127.0.0.1:4943",
-  // });
+  const [authorized, setAuthorized] = useState(false);
+  const login = async () => {
+    const authClient = await AuthClient.create();
 
-  // const canisterId = "qaa6y-5yaaa-aaaaa-aaafa-cai";
+    if (await authClient.isAuthenticated()) {
+      handleAuthenticated(authClient);
+    } else {
+      await authClient.login({
+        derivationOrigin: "https://j62gc-2iaaa-aaaal-qbynq-cai.icp0.io",
+        identityProvider: "https://identity.ic0.app/#authorize",
+        onSuccess: () => {
+          handleAuthenticated(authClient);
+        },
+      });
+    }
+  };
 
-  // const myActor = Actor.createActor(canisterId, {
-  //   agent,
-  //   canisterId,
-  // });
+  const handleAuthenticated = async (authClient) => {
+    const identity = await authClient.getIdentity();
+    const principalId = identity.getPrincipal().toString();
+    setAuthorized(true)
+    console.log("principalId", principalId);
+  };
 
-  // useEffect(() => {
-  //   async function runThis() {
-  //     const result = await myActor.getAllProducts();
-  //     console.log(result);
-  //   }
+  const checkAuth = async () => {
+    const authClient = await AuthClient.create();
+    if (await authClient.isAuthenticated()) {
+      setAuthorized(true)
+    } 
+  }
 
-  //   runThis();
-  // }, []);
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  const logOut = async () => {
+    const authClient = await AuthClient.create();
+    await authClient.logout()
+    setAuthorized(false)
+  }
+  
 
   return (
     <div className="bg-gray-950 text-gray-300 h-[100px] flex justify-between items-center gap-5 pl-5">
@@ -37,6 +58,11 @@ const Header = () => {
         <Link to="todo" className="px-2 py-1.5">
           Todo
         </Link>
+        {authorized ? <button onClick={logOut} className="px-2 py-1.5">
+          Logout
+        </button> : <button onClick={login} className="px-2 py-1.5">
+          Login
+        </button>}
       </div>
     </div>
   );

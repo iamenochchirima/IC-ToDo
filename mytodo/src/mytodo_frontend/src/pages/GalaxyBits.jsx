@@ -16,12 +16,16 @@ import {
   mytodo_backend,
 } from "../../../declarations/mytodo_backend/index";
 import FactCard from "../components/FactCard";
+import { AuthClient } from "@dfinity/auth-client";
 
 const GalaxyBits = () => {
+
+  const [authorized, setAuthorized] = useState(false);
+
   const [showForm, setShowForm] = useState(false);
   const [initiated, setInit] = useState(false);
   const location = useLocation();
-  // const [urls, setUrls] = useState(null);
+  const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUpLoading] = useState(false);
 
@@ -32,6 +36,28 @@ const GalaxyBits = () => {
   const [facts, setFacts] = useState([]);
   const [uploads, setUploads] = useState([]);
   const [imgCount, setImgCount] = useState(null)
+
+
+  const checkAuth = async () => {
+    const authClient = await AuthClient.create();
+    if (await authClient.isAuthenticated()) {
+      const identity = await authClient.getIdentity();
+      try {
+        const role = await mytodo_backend.my_role(identity.getPrincipal());
+        console.log(role)
+        if (role === "unauthorized") {
+          setAuthorized(false);
+        } else {
+          setAuthorized(true);
+        }
+      } catch (error) {
+        setAuthorized(false);
+        console.log(error);
+      }
+    } else {
+      console.log("Your'e not logged in");
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -58,6 +84,7 @@ const GalaxyBits = () => {
         if (res) {
           console.log(res);
           setLoading(false);
+          getFacts()
         }
       }
     } catch (error) {
@@ -68,11 +95,19 @@ const GalaxyBits = () => {
   const getFacts = async () => {
     try {
       const res = await mytodo_backend.getFacts();
+      console.log("facts", res)
       setFacts(res);
+      setDeleted(false)
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (deleted) {
+      getFacts()
+    }
+  }, [deleted])
 
   useEffect(() => {
     if (initiated) {
@@ -90,6 +125,7 @@ const GalaxyBits = () => {
       }
     };
     init();
+    checkAuth()
   }, []);
 
   const uploadAssets = async () => {
@@ -115,14 +151,6 @@ const GalaxyBits = () => {
     }
   };
 
-  console.log(imgCount)
-  
-
-  const handleDelete = async (url) => {
-    deleteAsset(url);
-    getFacts();
-  };
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handlePrevImage = (factImages, id) => {
@@ -145,12 +173,12 @@ const GalaxyBits = () => {
   return (
     <div className="min-h-screen text-gray-300">
       <div className="flex flex-col items-center justify-center mt-5">
-        <button
+        {authorized && <button
           onClick={() => setShowForm(true)}
           className="bg-blue-500 text-white p-2  rounded-lg"
         >
           Upload facts
-        </button>
+        </button>}
         {showForm && (
           <form onSubmit={handleSubmit} className="mt-5">
             <div className="mb-4">
@@ -205,12 +233,7 @@ const GalaxyBits = () => {
         <div className="grid grid-cols-3 gap-3">
           {facts?.map((fact) => (
             <div key={fact.id} className="col-span-1 ">
-              <FactCard
-                fact={fact}
-                id={factId}
-                currentImageIndex={currentImageIndex}
-                handlePrevImage={handlePrevImage}
-                handleNextImage={handleNextImage}
+              <FactCard {...{fact, setDeleted, factId, authorized, currentImageIndex, handleNextImage, handlePrevImage}}
               />
             </div>
           ))}

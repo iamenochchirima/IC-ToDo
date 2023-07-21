@@ -1,21 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { RxDotFilled } from "react-icons/rx";
+import { deleteAsset } from "../config/functions";
+import { mytodo_backend } from "../../../declarations/mytodo_backend/index";
 
 const FactCard = ({
   fact,
-  id,
+  factId,
+  setDeleted,
+  authorized,
   currentImageIndex,
   handlePrevImage,
   handleNextImage,
 }) => {
   const [index, setIndex] = useState(0);
 
+  const deleteAssetUrls = async (urls) => {
+    for (const url of urls) {
+      console.log("Deleting this url", url)
+      await deleteAsset(url);
+    }
+  };
+
+  const handleDelete = async (factId, urls) => {
+    await mytodo_backend.deleteFact(factId);
+    deleteAssetUrls(urls)
+    setDeleted(true)
+  };
+
   useEffect(() => {
-    if (id === fact.id) {
+    if (factId === fact.factId) {
       setIndex(currentImageIndex);
     }
-  }, [id, currentImageIndex]);
+  }, [factId, currentImageIndex]);
 
   const goToSlide = (slideIndex) => {
     setIndex(slideIndex);
@@ -32,13 +49,13 @@ const FactCard = ({
         ></div>
         <div className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactLeft
-            onClick={() => handlePrevImage(fact.images, fact.id)}
+            onClick={() => handlePrevImage(fact.images, fact.factId)}
             size={30}
           />
         </div>
         <div className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactRight
-            onClick={() => handleNextImage(fact.images, fact.id)}
+            onClick={() => handleNextImage(fact.images, fact.factId)}
             size={30}
           />
         </div>
@@ -55,6 +72,7 @@ const FactCard = ({
           </div>
         ))}
       </div>
+      {authorized && <button onClick={() => handleDelete(fact.id, fact.images)} className="p-2 bg-blue-500 rounded-lg text-white">Delete</button>}
       <h3>{fact.name}</h3>
       <h3>{fact.description}</h3>
     </>
