@@ -1,9 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AuthClient } from "@dfinity/auth-client";
+import { useSelector, useDispatch } from 'react-redux'
+import { setAdmin, setAuth } from "../redux/slices/authSlice";
+import { setInit } from "../redux/slices/appSlice";
+import { initActors } from "../storage-config/functions";
+import { backendActor } from "../config";
 
 const Header = () => {
-  const [authorized, setAuthorized] = useState(false);
+  const dispatch = useDispatch()
+  const {isAuthenticated, isAdmin} = useSelector((state) => state.auth)
+
   const login = async () => {
     const authClient = await AuthClient.create();
 
@@ -23,27 +30,53 @@ const Header = () => {
   const handleAuthenticated = async (authClient) => {
     const identity = await authClient.getIdentity();
     const principalId = identity.getPrincipal().toString();
-    setAuthorized(true)
+    dispatch(setAuth({ val: true }))
     console.log("principalId", principalId);
   };
 
   const checkAuth = async () => {
     const authClient = await AuthClient.create();
     if (await authClient.isAuthenticated()) {
-      setAuthorized(true)
-    } 
+      dispatch(setAuth({ val: true }))
+    }
   }
 
+  const init = async () => {
+    const res = await initActors();
+    if (res) {
+      dispatch(setInit());
+    }
+  };
+
   useEffect(() => {
+    init();
     checkAuth()
   }, [])
 
   const logOut = async () => {
     const authClient = await AuthClient.create();
     await authClient.logout()
-    setAuthorized(false)
+    dispatch(setAuth({ val: false }))
   }
-  
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const checkAuth = async () => {
+        console.log("Checking auth")
+        const authClient = await AuthClient.create();
+        const identity = await authClient.getIdentity();
+        const role = await backendActor.my_role(identity.getPrincipal());
+        if (role === "unauthorized") {
+          dispatch(setAdmin({ val: false }))
+        } else {
+          dispatch(setAdmin({ val: true }))
+        }
+        console.log("User role: ", role);
+      }
+      checkAuth()
+    }
+  }, [isAuthenticated])
+
 
   return (
     <div className="bg-gray-950 text-gray-300 h-[100px] flex justify-between items-center gap-5 pl-5">
@@ -58,7 +91,7 @@ const Header = () => {
         <Link to="todo" className="px-2 py-1.5">
           Todo
         </Link>
-        {authorized ? <button onClick={logOut} className="px-2 py-1.5">
+        {isAuthenticated ? <button onClick={logOut} className="px-2 py-1.5">
           Logout
         </button> : <button onClick={login} className="px-2 py-1.5">
           Login

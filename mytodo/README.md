@@ -29,6 +29,11 @@ If you want to test your project locally, you can use the following commands:
 dfx start --background
 
 # Deploys your canisters to the replica and generates your candid interface
+
+dfx deploy file_scaling_manager --argument='(false)'
+
+dfx deploy file_storage --argument='(false)'
+
 dfx deploy
 ```
 

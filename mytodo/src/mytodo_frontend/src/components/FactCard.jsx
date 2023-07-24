@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BsChevronCompactLeft, BsChevronCompactRight } from "react-icons/bs";
 import { RxDotFilled } from "react-icons/rx";
-import { deleteAsset } from "../config/functions";
-import { mytodo_backend } from "../../../declarations/mytodo_backend/index";
+import { deleteAsset } from "../storage-config/functions";
+import { backendActor } from "../config";
 
 const FactCard = ({
   fact,
   factId,
   setDeleted,
-  authorized,
+  isAdmin,
   currentImageIndex,
   handlePrevImage,
   handleNextImage,
@@ -23,13 +23,13 @@ const FactCard = ({
   };
 
   const handleDelete = async (factId, urls) => {
-    await mytodo_backend.deleteFact(factId);
+    await backendActor.deleteFact(factId);
     deleteAssetUrls(urls)
     setDeleted(true)
   };
 
   useEffect(() => {
-    if (factId === fact.factId) {
+    if (factId === fact.id) {
       setIndex(currentImageIndex);
     }
   }, [factId, currentImageIndex]);
@@ -49,13 +49,13 @@ const FactCard = ({
         ></div>
         <div className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] left-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactLeft
-            onClick={() => handlePrevImage(fact.images, fact.factId)}
+            onClick={() => handlePrevImage(fact.images, fact.id)}
             size={30}
           />
         </div>
         <div className="hidden group-hover:block absolute top-[50%] -translate-x-0 translate-y-[-50%] right-5 text-2xl rounded-full p-2 bg-black/20 text-white cursor-pointer">
           <BsChevronCompactRight
-            onClick={() => handleNextImage(fact.images, fact.factId)}
+            onClick={() => handleNextImage(fact.images, fact.id)}
             size={30}
           />
         </div>
@@ -72,7 +72,7 @@ const FactCard = ({
           </div>
         ))}
       </div>
-      {authorized && <button onClick={() => handleDelete(fact.id, fact.images)} className="p-2 bg-blue-500 rounded-lg text-white">Delete</button>}
+      {isAdmin && <button onClick={() => handleDelete(fact.id, fact.images)} className="p-2 bg-blue-500 rounded-lg text-white">Delete</button>}
       <h3>{fact.name}</h3>
       <h3>{fact.description}</h3>
     </>

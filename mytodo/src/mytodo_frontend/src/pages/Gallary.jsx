@@ -8,20 +8,16 @@ import {
   getVersion,
   initActors,
   uploadFile,
-} from "../config/functions";
-import { AuthClient } from "@dfinity/auth-client";
+} from "../storage-config/functions";
 
 import { useLocation } from "react-router-dom";
-import {
-  canisterId,
-  mytodo_backend,
-} from "../../../declarations/mytodo_backend/index";
+import { useSelector, useDispatch } from 'react-redux'
 
 const Gallary = () => {
-  const [authorized, setAuthorized] = useState(false);
+  const {isAuthenticated, isAdmin} = useSelector((state) => state.auth)
+  const {storageInitiated} = useSelector((state) => state.app)
 
   const [showForm, setShowForm] = useState(false);
-  const [initiated, setInit] = useState(false);
   const location = useLocation();
   const [urls, setUrls] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -43,50 +39,16 @@ const Gallary = () => {
     }
   };
 
-  const checkAuth = async () => {
-    const authClient = await AuthClient.create();
-    if (await authClient.isAuthenticated()) {
-      const identity = await authClient.getIdentity();
-      const userPrincipal = identity.getPrincipal().toString();
-      console.log(userPrincipal);
-      try {
-        const role = await mytodo_backend.my_role(identity.getPrincipal());
-        if (role === "unauthorized") {
-          setAuthorized(false);
-        } else {
-          setAuthorized(true);
-        }
-        console.log("User role: ", role);
-      } catch (error) {
-        setAuthorized(false);
-        console.log(error);
-      }
-    } else {
-      console.log("Your'e not logged in");
-    }
-  };
   useEffect(() => {
-    if (initiated) {
+    if (storageInitiated) {
       getImages();
       setLoading(false);
     }
-  }, [initiated]);
-
-  useEffect(() => {
-    setLoading(true);
-    const init = async () => {
-      const res = await initActors();
-      if (res) {
-        setInit(true);
-      }
-    };
-    init();
-    checkAuth();
-  }, []);
+  }, [storageInitiated]);
 
   const uploadAssets = async (e) => {
     e.preventDefault();
-    if (initiated && uploads) {
+    if (storageInitiated && uploads) {
       setUpLoading(true);
       setLoading(true);
       const file_path = location.pathname;
@@ -114,13 +76,10 @@ const Gallary = () => {
     getImages();
   };
 
-  console.log(images, "images here");
-  console.log(authorized)
-
   return (
     <div className="min-h-screen text-gray-800 px-5">
       <div className="flex flex-col items-center justify-center mt-5">
-        {authorized && (
+        {isAdmin && (
           <button
             onClick={() => setShowForm(true)}
             className="bg-blue-500 p-2 text-white rounded-lg"
@@ -162,7 +121,7 @@ const Gallary = () => {
           {images?.map((image) => (
             <div key={image.id} className="col-span-1">
               <img src={image.url} className="" alt="Image" />
-              {authorized && (
+              {isAdmin && (
                 <button
                   className="my-4"
                   onClick={() => handleDelete(image.url)}

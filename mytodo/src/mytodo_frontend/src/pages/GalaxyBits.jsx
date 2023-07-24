@@ -8,22 +8,19 @@ import {
   getVersion,
   initActors,
   uploadFile,
-} from "../config/functions";
+} from "../storage-config/functions";
 
 import { useLocation } from "react-router-dom";
-import {
-  canisterId,
-  mytodo_backend,
-} from "../../../declarations/mytodo_backend/index";
 import FactCard from "../components/FactCard";
-import { AuthClient } from "@dfinity/auth-client";
+import { useSelector, useDispatch } from 'react-redux'
+import { backendActor } from "../config";
 
 const GalaxyBits = () => {
 
-  const [authorized, setAuthorized] = useState(false);
+  const {storageInitiated} = useSelector((state) => state.app)
+  const {isAuthenticated, isAdmin} = useSelector((state) => state.auth)
 
   const [showForm, setShowForm] = useState(false);
-  const [initiated, setInit] = useState(false);
   const location = useLocation();
   const [deleted, setDeleted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,27 +35,6 @@ const GalaxyBits = () => {
   const [imgCount, setImgCount] = useState(null)
 
 
-  const checkAuth = async () => {
-    const authClient = await AuthClient.create();
-    if (await authClient.isAuthenticated()) {
-      const identity = await authClient.getIdentity();
-      try {
-        const role = await mytodo_backend.my_role(identity.getPrincipal());
-        console.log(role)
-        if (role === "unauthorized") {
-          setAuthorized(false);
-        } else {
-          setAuthorized(true);
-        }
-      } catch (error) {
-        setAuthorized(false);
-        console.log(error);
-      }
-    } else {
-      console.log("Your'e not logged in");
-    }
-  };
-
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const selected = files.slice(0, 4);
@@ -68,7 +44,6 @@ const GalaxyBits = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Runing the submit function");
     try {
       const urls = await uploadAssets();
       console.log("Images saved, urls here", urls);
@@ -80,7 +55,7 @@ const GalaxyBits = () => {
           description: description,
           images: urls,
         };
-        const res = await mytodo_backend.saveFact(input);
+        const res = await backendActor.saveFact(input);
         if (res) {
           console.log(res);
           setLoading(false);
@@ -94,8 +69,7 @@ const GalaxyBits = () => {
 
   const getFacts = async () => {
     try {
-      const res = await mytodo_backend.getFacts();
-      console.log("facts", res)
+      const res = await backendActor.getFacts();
       setFacts(res);
       setDeleted(false)
     } catch (error) {
@@ -110,26 +84,14 @@ const GalaxyBits = () => {
   }, [deleted])
 
   useEffect(() => {
-    if (initiated) {
+    if (storageInitiated) {
       getFacts();
       setLoading(false);
     }
-  }, [initiated]);
-
-  useEffect(() => {
-    setLoading(true);
-    const init = async () => {
-      const res = await initActors();
-      if (res) {
-        setInit(true);
-      }
-    };
-    init();
-    checkAuth()
-  }, []);
+  }, [storageInitiated]);
 
   const uploadAssets = async () => {
-    if (initiated && uploads) {
+    if (storageInitiated && uploads) {
       setUpLoading(true);
       const file_path = location.pathname;
       const assetsUrls = [];
@@ -140,7 +102,7 @@ const GalaxyBits = () => {
           assetsUrls.push(assetUrl);
           console.log("This file was successfully uploaded:", image.name);
           getFacts();
-          setImgCount(prevCount => prevCount - 1); 
+          setImgCount(prevCount => prevCount - 1);
         } catch (error) {
           console.error("Error uploading file:", image.name, error);
         }
@@ -169,11 +131,10 @@ const GalaxyBits = () => {
     setCurrentImageIndex(newIndex);
   };
 
-
   return (
     <div className="min-h-screen text-gray-300">
       <div className="flex flex-col items-center justify-center mt-5">
-        {authorized && <button
+        {isAdmin && <button
           onClick={() => setShowForm(true)}
           className="bg-blue-500 text-white p-2  rounded-lg"
         >
@@ -213,9 +174,8 @@ const GalaxyBits = () => {
             </div>
             <button
               type="submit"
-              className={`${
-                loading || uploading ? `bg-green-600` : `bg-blue-500`
-              }   py-2 px-4 rounded-lg text-white`}
+              className={`${loading || uploading ? `bg-green-600` : `bg-blue-500`
+                }   py-2 px-4 rounded-lg text-white`}
             >
               {uploading && `Uploading images... ${imgCount}`}
               {loading && "Saving..."}
@@ -233,7 +193,7 @@ const GalaxyBits = () => {
         <div className="grid grid-cols-3 gap-3">
           {facts?.map((fact) => (
             <div key={fact.id} className="col-span-1 ">
-              <FactCard {...{fact, setDeleted, factId, authorized, currentImageIndex, handleNextImage, handlePrevImage}}
+              <FactCard {...{ fact, setDeleted, factId, isAdmin, currentImageIndex, handleNextImage, handlePrevImage }}
               />
             </div>
           ))}
