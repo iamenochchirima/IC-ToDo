@@ -1,3 +1,7 @@
 [dependencies]
 base = "0.8.8"
 hashmap = "https://github.com/ZhenyaUsenko/motoko-hash-map#master"
+ext = "https://github.com/aviate-labs/ext.std#v0.2.0"
+principal = "https://github.com/aviate-labs/principal.mo#v0.2.4"
+canistergeek = "0.0.4"
+cap-motoko-library = "https://github.com/stephenandrews/cap-motoko-library#master"

@@ -10,6 +10,13 @@ import { backendActor } from "../config";
 const Header = () => {
   const dispatch = useDispatch()
   const {isAuthenticated, isAdmin} = useSelector((state) => state.auth)
+  const sendGridApi = process.env.MYTODO_FRONTEND_SENDGRID_API_KEY
+
+
+  console.log("Send grid api", sendGridApi)
+
+
+ 
 
   const login = async () => {
     const authClient = await AuthClient.create();
@@ -90,6 +97,9 @@ const Header = () => {
         </Link>
         <Link to="todo" className="px-2 py-1.5">
           Todo
+        </Link>
+        <Link to="contact" className="px-2 py-1.5">
+          Contact
         </Link>
         {isAuthenticated ? <button onClick={logOut} className="px-2 py-1.5">
           Logout

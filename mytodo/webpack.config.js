@@ -87,9 +87,14 @@ module.exports = {
       cache: false,
     }),
     new webpack.EnvironmentPlugin({
-      NODE_ENV: "development",
-      ...canisterEnvVariables,
-    }),
+      MYTODO_FRONTEND_SENDGRID_API_KEY: "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",
+      ...Object.keys(process.env).filter((key) => {
+        if (key.includes("CANISTER")) return true;
+        if (key.includes("DFX")) return true;
+        if (key.includes("MYTODO_FRONTEND_SENDGRID_API_KEY")) return true;
+        return false;
+      }),
+}),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
